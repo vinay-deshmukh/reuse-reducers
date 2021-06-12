@@ -110,6 +110,14 @@ interface SubSliceArgs {
   initialState: SubSliceState;
   actionNamePrefix: string;
 }
+/**
+ * This is essentially just a call to
+ * `createSlice` from toolkit.
+ * Only "new" thing is that this could be looked as
+ * a partially applied "createSlice", and the partial
+ * application could be complete with the sliceName.
+ *
+ */
 function createSubSlice({ actionNamePrefix, initialState }: SubSliceArgs) {
   const actions = {
     ToggleOne: createAction(actionNamePrefix + "/toggleOne", function (
