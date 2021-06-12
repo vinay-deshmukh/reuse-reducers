@@ -1,9 +1,11 @@
 import {
   createAction,
+  createNextState,
   createReducer,
   createSlice,
   PayloadAction
 } from "@reduxjs/toolkit";
+import reduceReducers from "reduce-reducers";
 import { RootState } from "../store";
 
 import { fruits, vegetables, meats } from "./mockData";
@@ -70,38 +72,18 @@ const slice = createSlice({
       state.fruitsSub = createSubSliceFromSimpleItemArr(fruits);
       state.vegetablesSub = createSubSliceFromSimpleItemArr(vegetables);
     });
-
-    builder.addMatcher(
-      // run the other reducers regardles of whether
-      // this slice's actions are fired or not
-      () => true,
-      (state, action) => {
-        state.fruitsSub = subslices.fruitsSlice.reducer(
-          state.fruitsSub,
-          action
-        );
-      }
-    );
-
-    // for (const [key, value] of Object.entries(subslices)) {
-    //   const reducer = value.reducer;
-    //   const actions = value.actions;
-
-    //   for (const oneAct of Object.values(actions)) {
-    //     builder.addCase(oneAct, reducer);
-    //   }
-    // }
   }
 });
-// const slice = {
-//   reducer: function (state: State = initialState, action) {
-//     return state;
-//   }
 
-//createReducer(initialState,builder => 0)
-// };
-
-export const { reducer } = slice;
+// export const { reducer } = slice;
+export const reducer = reduceReducers(
+  initialState,
+  slice.reducer,
+  createNextState((state, action) => {
+    state.fruitsSub = subslices.fruitsSlice.reducer(state.fruitsSub, action);
+    // state.other Slice for multi select
+  })
+);
 const selectSlice = (state: RootState) => state.pageOne;
 export const PageSelectors = {
   selectAllFruits: (state: RootState) => selectSlice(state).fruitsSub.allItems,
